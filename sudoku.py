@@ -184,15 +184,16 @@ class Board(dict):
     def __str__(self):
         lines = []
         box_lines = []
+        square_size = len(str(self.size))
         for x in range(self.size):
             row_squares = []
             box_squares = []
             for y in range(self.size):
                 square = self.get(self._xy_key(x, y))
                 if len(square) == 1:
-                    box_squares.append(str(square[0]))
+                    box_squares.append(str(square[0]).center(square_size))
                 else:
-                    box_squares.append('.')
+                    box_squares.append('.'.center(square_size))
                 if len(box_squares) == self.box_size:
                     row_squares.append(' '.join(box_squares))
                     box_squares = []
@@ -202,7 +203,7 @@ class Board(dict):
                 lines.append('\n'.join(box_lines))
                 box_lines = []
                 if x < self.size - 1:
-                    box_dividers = ['-' * (2 * self.box_size - 1) for box in range(self.box_size)]
+                    box_dividers = ['-' * (square_size * (2 * self.box_size - 1)) for box in range(self.box_size)]
                     lines.append('\n{}\n'.format('-+-'.join(box_dividers)))
         return ''.join(lines)
 
