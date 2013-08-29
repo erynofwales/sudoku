@@ -21,7 +21,7 @@ class Board(dict):
         assert self.box_size == int(self.box_size), 'Invalid size; value must be a perfect square'
 
         # The range of possible values for a square.
-        possible_values = range(1, self.size + 1)
+        self.possible_values = range(1, self.size + 1)
 
         def kwget(x, y):
             '''
@@ -31,8 +31,8 @@ class Board(dict):
             '''
             initial_value = kwargs.get('x{}y{}'.format(x, y))
             if initial_value is None:
-                return list(possible_values)
-            if initial_value not in possible_values:
+                return list(self.possible_values)
+            if initial_value not in self.possible_values:
                 raise ValueError('Invalid initial value for square ({}, {}): {}'.format(x, y, initial_value))
             return [initial_value]
 
@@ -42,10 +42,40 @@ class Board(dict):
                                      for y in range(self.size)])
 
     def _xy_key(self, x, y):
-        '''
-        Given {x} and {y}, generate a key to refer to the square at coordinate (x, y) in the grid.
-        '''
+        '''Given {x} and {y}, generate a key to refer to the square at coordinate (x, y) in the grid.'''
         return (int(x), int(y))
+
+    @property
+    def solved(self):
+        '''
+        Determines if the board has been solved. First, determine if all squares have no more than one value (i.e. they
+        have had values assigned to them). If not, return False. If so, check each unit (rows, columns, and boxes) to
+        make sure that each has one and only one of each value in the range of possible values for a unit. If not,
+        return False; otherwise, return True.
+        '''
+        if not all(len(s) == 1 for s in self.values()):
+            return False
+
+        def validate_unit(unit):
+            '''
+            Validate {unit} by ensuring it has exactly 1 of each value in the range of possible values.
+            '''
+            necessary_values = list(self.possible_values)
+            for square, values in unit.items():
+                v = values[0]
+                if v in necessary_values:
+                    necessary_values.remove(v)
+                else:
+                    return False
+            if len(necessary_values) != 0:
+                return False
+            return True
+
+        return (    all(validate_unit(self.row(r)) for r in range(self.size))
+                and all(validate_unit(self.col(c)) for c in range(self.size))
+                and all(validate_unit(self.box(x, y))
+                        for x in range(0, self.size, self.box_size)
+                        for y in range(0, self.size, self.box_size)))
 
     def row(self, idx):
         '''
