@@ -203,7 +203,8 @@ class Board(dict):
                 lines.append('\n'.join(box_lines))
                 box_lines = []
                 if x < self.size - 1:
-                    box_dividers = ['-' * (square_size * self.box_size + square_size)) for box in range(self.box_size)]
+                    # Don't print a divider on the last line.
+                    box_dividers = ['-' * ((square_size + 1) * self.box_size - 1) for box in range(self.box_size)]
                     lines.append('\n{}\n'.format('-+-'.join(box_dividers)))
         return ''.join(lines)
 
