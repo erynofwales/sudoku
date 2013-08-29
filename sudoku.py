@@ -122,6 +122,29 @@ class Board(dict):
         for square in self:
             self[square] = list(range(1, self.size + 1))
 
+    def solve(self):
+        for square, values in self.items():
+            if len(values) == 1:
+                try:
+                    self.assign(square, values)
+                except ValueError:
+                    raise
+        return self.solved
+
+    def assign(self, square, value):
+        '''
+        Assign {value} to {square}. {value} is expected to be an iterable (a list). {key} should be a valid (x, y)
+        coordinate pair for referencing a square on the board.
+        '''
+        LOG.debug('Assigning values {} to square {}.'.format(value, square))
+        removed_values = set(self[square]) - set(value)
+        for v in removed_values:
+            try:
+                self.eliminate(square, v)
+            except ValueError:
+                raise
+        return True
+
     def eliminate(self, square, value):
         '''
         Eliminate {value} from {square}, propagating changes to the squares peers as necessary. This process involves
@@ -131,7 +154,7 @@ class Board(dict):
         '''
         if value not in self[square]:
             LOG.debug('Value {} not in square {}; skipping'.format(value, square))
-            return
+            return True
 
         # Update peer value list.
         super(Board, self).__setitem__(square, [v for v in self[square] if v != value])
@@ -167,19 +190,10 @@ class Board(dict):
         pass
 
     def __setitem__(self, key, value):
-        '''
-        Set the square defined by {key}'s value to {value}. {value} is expected to be an iterable (a list). {key} should
-        be a valid (x, y) coordinate pair for referencing a square on the board.
-        '''
         if key not in self:
             # Don't allow adding new keys, only changes to existing ones.
             raise KeyError('Key {} is not a valid coordinate pair.'.format(key))
-
-        # Remove all values other than the one given from the square.
-        LOG.debug('Setting value {} at {}.'.format(value, key))
-        removed_values = set(self[key]) - set(value)
-        for v in removed_values:
-            self.eliminate(key, v)
+        self.assign(key, value)
 
     def __str__(self):
         lines = []
