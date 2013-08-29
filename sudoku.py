@@ -105,6 +105,10 @@ class Board(dict):
         return {k: v for k, v in self.items() if k[0] in bx_range and k[1] in by_range}
 
     def peers(self, x, y):
+        '''
+        Generate and return a list of peers for the square at coordinates ({x}, {y}). Peers are defined as all the
+        squares in the same row, column, and box as the given square.
+        '''
         # Generate a dictionary of all the squares in the row, column, and box containing the given square.
         peers = dict(list(self.row(y).items()) + list(self.col(x).items()) + list(self.box(x, y).items()))
         # Remove the given square.
@@ -113,14 +117,17 @@ class Board(dict):
 
     def clear(self):
         '''
-        Clear the board.
+        Clear the board. Resets each square's possible value list to the full range of possible values for this board.
         '''
         for square in self:
             self[square] = list(range(1, self.size + 1))
 
     def eliminate(self, square, value):
         '''
-        Eliminate {value} from square at ({x}, {y}).
+        Eliminate {value} from {square}, propagating changes to the squares peers as necessary. This process involves
+        two logical rules of Sudoku. First, if a square is reduced to a single possible value, assign that value to the
+        square and remove the value from the possible value lists of its peers. Second, if a unit has only one square
+        that can hold a value, put the value in that square and propagate that change to its peers.
         '''
         if value not in self[square]:
             LOG.debug('Value {} not in square {}; skipping'.format(value, square))
@@ -160,9 +167,15 @@ class Board(dict):
         pass
 
     def __setitem__(self, key, value):
-        #if key not in self:
+        '''
+        Set the square defined by {key}'s value to {value}. {value} is expected to be an iterable (a list). {key} should
+        be a valid (x, y) coordinate pair for referencing a square on the board.
+        '''
+        if key not in self:
             # Don't allow adding new keys, only changes to existing ones.
-            #return
+            raise KeyError('Key {} is not a valid coordinate pair.'.format(key))
+
+        # Remove all values other than the one given from the square.
         LOG.debug('Setting value {} at {}.'.format(value, key))
         removed_values = set(self[key]) - set(value)
         for v in removed_values:
