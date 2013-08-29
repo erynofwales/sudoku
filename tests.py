@@ -101,6 +101,25 @@ def test_9x9_peers():
     	assert epeer in peers, '{} not in peers of (3, 3)'.format(epeer)
 
 
+def test_9x9_str():
+    '''
+    Test string generation/printing.
+    '''
+    b = sudoku.Board()
+    expected_str = '\n'.join(['. . . | . . . | . . .',
+                              '. . . | . . . | . . .',
+                              '. . . | . . . | . . .',
+                              '------+-------+------',
+                              '. . . | . . . | . . .',
+                              '. . . | . . . | . . .',
+                              '. . . | . . . | . . .',
+                              '------+-------+------',
+                              '. . . | . . . | . . .',
+                              '. . . | . . . | . . .',
+                              '. . . | . . . | . . .'])
+    assert str(b) == expected_str
+
+
 def main():
     nose.main()
 
