@@ -135,6 +135,14 @@ class Board(dict):
                     raise
         return self.solved
 
+    def search(self):
+        if self.solved:
+            return True
+
+        # Chose the square with the fewest possible values.
+        _, smallest = min((len(self[sq]), sq) for sq in self if len(self[sq]) > 1)
+        # Deepcopy the board.
+
     def assign(self, square, value):
         '''
         Assign {value} to {square}. {value} is expected to be an iterable (a list). {key} should be a valid (x, y)
