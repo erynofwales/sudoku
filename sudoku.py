@@ -29,7 +29,7 @@ class Board(dict):
             all possible values for the square. If an initial value was given, make sure it is one of the valid initial
             values. Raise a ValueError if not.
             '''
-            initial_value = kwargs.get('x{}y{}'.format(x, y))
+            initial_value = kwargs.get(Board.xy_kwargs_key(x, y))
             if initial_value is None:
                 return list(self.possible_values)
             if initial_value not in self.possible_values:
@@ -37,13 +37,22 @@ class Board(dict):
             return [initial_value]
 
         # Make the grid.
-        super(Board, self).__init__([(self._xy_key(x, y), kwget(x, y))
+        super(Board, self).__init__([(Board.xy_key(x, y), kwget(x, y))
                                      for x in range(self.size)
                                      for y in range(self.size)])
 
-    def _xy_key(self, x, y):
+    @classmethod
+    def xy_key(self, x, y):
         '''Given {x} and {y}, generate a key to refer to the square at coordinate (x, y) in the grid.'''
         return (int(x), int(y))
+
+    @classmethod
+    def xy_kwargs_key(self, x, y):
+        '''
+        Given {x} and {y}, generate a key to refer to the square in the __init__ kwargs at coordinate (x, y) in the
+        grid.
+        '''
+        return 'x{}y{}'.format(x, y)
 
     @property
     def solved(self):
@@ -205,7 +214,7 @@ class Board(dict):
             row_squares = []
             box_squares = []
             for x in range(self.size):
-                square = self.get(self._xy_key(x, y))
+                square = self.get(Board.xy_key(x, y))
                 if len(square) == 1:
                     box_squares.append(str(square[0]).center(square_size))
                 else:
@@ -223,5 +232,3 @@ class Board(dict):
                     box_dividers = ['-' * ((square_size + 1) * self.box_size - 1) for box in range(self.box_size)]
                     lines.append('\n{}\n'.format('-+-'.join(box_dividers)))
         return ''.join(lines)
-
-
