@@ -120,7 +120,7 @@ class Board(dict):
         Clear the board. Resets each square's possible value list to the full range of possible values for this board.
         '''
         for square in self:
-            self[square] = list(range(1, self.size + 1))
+            self[square] = list(self.possible_values)
 
     def solve(self):
         for square, values in self.items():
@@ -143,6 +143,8 @@ class Board(dict):
                 self.eliminate(square, v)
             except ValueError:
                 raise
+        # TODO: To make this work right, I should probably also do the same as above for the values added *back* into
+        # the values for {square}.
         return True
 
     def eliminate(self, square, value):
