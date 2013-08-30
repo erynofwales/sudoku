@@ -23,23 +23,18 @@ class Board(dict):
         # The range of possible values for a square.
         self.possible_values = range(1, self.size + 1)
 
-        def kwget(x, y):
-            '''
-            Try to get an initial value for square ({x}, {y}) from the given kwargs. If none exists, return a list of
-            all possible values for the square. If an initial value was given, make sure it is one of the valid initial
-            values. Raise a ValueError if not.
-            '''
-            initial_value = kwargs.get(Board.xy_kwargs_key(x, y))
-            if initial_value is None:
-                return list(self.possible_values)
-            if initial_value not in self.possible_values:
-                raise ValueError('Invalid initial value for square ({}, {}): {}'.format(x, y, initial_value))
-            return [initial_value]
-
         # Make the grid.
-        super(Board, self).__init__([(Board.xy_key(x, y), kwget(x, y))
+        super(Board, self).__init__([(Board.xy_key(x, y), list(self.possible_values))
                                      for x in range(self.size)
                                      for y in range(self.size)])
+        for square in self:
+            initial_value = kwargs.get(Board.xy_kwargs_key(*square))
+            if initial_value is None:
+                continue
+            if initial_value not in self.possible_values:
+                raise ValueError('Invalid initial value for square ({}, {}): {}'.format(x, y, initial_value))
+            LOG.debug('Setting initial value of {} to {}'.format(square, initial_value))
+            self[square] = [initial_value]
 
     @classmethod
     def xy_key(self, x, y):
@@ -121,7 +116,7 @@ class Board(dict):
         # Generate a dictionary of all the squares in the row, column, and box containing the given square.
         peers = dict(list(self.row(y).items()) + list(self.col(x).items()) + list(self.box(x, y).items()))
         # Remove the given square.
-        del peers[self._xy_key(x, y)]
+        del peers[Board.xy_key(x, y)]
         return peers
 
     def clear(self):
