@@ -5,6 +5,7 @@
 A Sudoku solver.
 '''
 
+import copy
 import logging
 import math
 
@@ -34,7 +35,7 @@ class Board(dict):
             if initial_value not in self.possible_values:
                 raise ValueError('Invalid initial value for square ({}, {}): {}'.format(x, y, initial_value))
             LOG.debug('Setting initial value of {} to {}'.format(square, initial_value))
-            self[square] = [initial_value]
+            self.assign(square, [initial_value])
 
     @classmethod
     def xy_key(self, x, y):
@@ -119,29 +120,36 @@ class Board(dict):
         del peers[Board.xy_key(x, y)]
         return peers
 
-    def clear(self):
+    def clear(self, squares=None):
         '''
         Clear the board. Resets each square's possible value list to the full range of possible values for this board.
         '''
-        for square in self:
-            self[square] = list(self.possible_values)
+        for square in (self if squares is None else squares):
+            self.assign(square, list(self.possible_values))
 
     def solve(self):
-        for square, values in self.items():
-            if len(values) == 1:
-                try:
-                    self.assign(square, values)
-                except ValueError:
-                    raise
-        return self.solved
+        return self.search()
 
     def search(self):
+        '''
+        Search for a solution, depth-first. Return the solved Board as a new instance of this class.
+        '''
         if self.solved:
-            return True
+            return self
 
         # Chose the square with the fewest possible values.
         _, smallest = min((len(self[sq]), sq) for sq in self if len(self[sq]) > 1)
         # Deepcopy the board.
+        for v in self[smallest]:
+            trial_board = copy.deepcopy(self)
+            try:
+                trial_board.assign(smallest, [v])
+                if trial_board.search():
+                    return trial_board
+            except ValueError:
+                continue
+        raise ValueError('No possible solution found.')
+
 
     def assign(self, square, value):
         '''
@@ -196,18 +204,12 @@ class Board(dict):
                 raise ValueError('No place for value {} to go in unit {}; board is now invalid'.format(value, unit))
             elif len(places) == 1:
                 LOG.debug('One place for value {} to be in unit {}; setting'.format(value, unit))
-                self[places[0]] = [value]
+                self.assign(places[0], [value])
         return True
 
     def __delitem__(self, key):
         # Don't allow deleting keys from self.
         pass
-
-    def __setitem__(self, key, value):
-        if key not in self:
-            # Don't allow adding new keys, only changes to existing ones.
-            raise KeyError('Key {} is not a valid coordinate pair.'.format(key))
-        self.assign(key, value)
 
     def __str__(self):
         lines = []
