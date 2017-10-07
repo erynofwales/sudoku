@@ -140,15 +140,18 @@ class Board(dict):
         # Chose the square with the fewest possible values.
         _, smallest = min((len(self[sq]), sq) for sq in self if len(self[sq]) > 1)
         # Deepcopy the board.
+        trials = []
         for v in self[smallest]:
             trial_board = copy.deepcopy(self)
-            try:
-                trial_board.assign(smallest, [v])
-                if trial_board.search():
-                    return trial_board
-            except ValueError:
-                continue
-        raise ValueError('No possible solution found.')
+            if trial_board.assign(smallest, [v]):
+                trials.append(trial_board)
+                trial_board.search()
+            else:
+                trials.append(None)
+        for t in trials:
+            if t is not None:
+                return t
+        return False
 
 
     def assign(self, square, value):
@@ -159,12 +162,8 @@ class Board(dict):
         LOG.debug('Assigning values {} to square {}.'.format(value, square))
         removed_values = set(self[square]) - set(value)
         for v in removed_values:
-            try:
-                self.eliminate(square, v)
-            except ValueError:
-                raise
-        # TODO: To make this work right, I should probably also do the same as above for the values added *back* into
-        # the values for {square}.
+            if not self.eliminate(square, v):
+                return False
         return True
 
     def eliminate(self, square, value):
@@ -186,25 +185,24 @@ class Board(dict):
         if len(self[square]) == 0:
             # Whoops. Removed the last value... We have a contradiction now.
             LOG.error('Removed last value from square {}'.format(square))
-            raise ValueError('Removed last value from square {}; board is now invalid'.format(square))
+            return False
         elif len(self[square]) == 1:
             # One value left in this square. Propagate changes to its peers.
             LOG.debug('One value left in square {}; eliminating {} from its peers'.format(square, self[square][0]))
-            try:
-                for peer in self.peers(*square):
-                    self.eliminate(peer, self[square][0])
-            except ValueError:
-                raise
+            for peer in self.peers(*square):
+                if not self.eliminate(peer, self[square][0]):
+                    return False
 
         # (2) If a unit has only one square for a value, put it there.
         for unit in (self.row(square[1]), self.col(square[0]), self.box(*square)):
             places = [sq for sq in unit if value in unit[sq]]
             if len(places) == 0:
                 LOG.error('No place for value {} to go in unit {}'.format(value, unit))
-                raise ValueError('No place for value {} to go in unit {}; board is now invalid'.format(value, unit))
+                return False
             elif len(places) == 1:
                 LOG.debug('One place for value {} to be in unit {}; setting'.format(value, unit))
                 self.assign(places[0], [value])
+
         return True
 
     def __delitem__(self, key):
