@@ -57,6 +57,8 @@ class Sudoku:
         dim = self.dimension
         return (self.square(x, y) for y in range(dim) for x in range(dim))
 
+    # TODO: Break the above into helper methods that produce a single thing given an index.
+
     @property
     def solved(self):
         expected = set(range(self.size))
