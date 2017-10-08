@@ -8,13 +8,16 @@ import itertools
 import math
 
 class Sudoku:
-    def __init__(self, size=9):
+    def __init__(self, size=9, initial=None):
         dim = math.sqrt(size)
         if dim != int(dim):
             raise ValueError('Board size must have an integral square root.')
         self._dimension = int(dim)
         self.size = size
-        self.board = bytearray(b'\x00' * (size * size))
+        if initial:
+            self.board = bytearray(initial)[:9**2]
+        else:
+            self.board = bytearray(b'\x00' * (size * size))
 
     @property
     def dimension(self):
