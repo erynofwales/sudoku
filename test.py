@@ -52,3 +52,7 @@ class Sudoku4BasicTests(Sudoku4TestCase):
             sq_list = list(sq)
             with self.subTest(sq=sq_list, ex=exsq):
                 self.assertEqual(sq_list, exsq)
+
+class Sudoku4SolvedTests(Sudoku4TestCase):
+    def test_that_an_empty_board_is_not_solved(self):
+        self.assertFalse(self.board.solved)

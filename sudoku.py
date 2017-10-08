@@ -66,6 +66,15 @@ class Sudoku:
         dim = self.dimension
         return (self.square(x, y) for y in range(dim) for x in range(dim))
 
+    @property
+    def solved(self):
+        expected = set(range(self.size))
+        return all([
+            all(expected == set(row) for row in self.rows),
+            all(expected == set(col) for col in self.columns),
+            all(expected == set(sqr) for sqr in self.squares)
+        ])
+
     def square(self, x, y):
         dim = self.dimension
         if (x < 0 or x >= dim) or (y < 0 or y >= dim):
