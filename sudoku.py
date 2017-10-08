@@ -22,27 +22,20 @@ class Sudoku:
 
     @property
     def rows(self):
-        return self._apply_index_range_list(self.index_rows)
+        return self._apply_index_ranges(self.index_rows)
 
     @property
     def columns(self):
-        return self._apply_index_range_list(self.index_columns)
+        return self._apply_index_ranges(self.index_columns)
 
     @property
     def squares(self):
-        return self._apply_index_range_list(self.index_squares)
-
-    def _apply_index_range_list(self, ranges):
-        return (self._apply_index_range(r) for r in ranges)
-
-    def _apply_index_range(self, rng):
-        return (self.board[i] for i in rng)
+        return self._apply_index_ranges(self.index_squares)
 
     @property
     def index_rows(self):
         '''
-        Return a list of ranges of indexes into the board, each
-        defining a row.
+        Return an iterable of ranges of indexes into the board, each defining a row.
         '''
         sz = self.size
         return (range(i * sz, i * sz + sz) for i in range(sz))
@@ -50,8 +43,7 @@ class Sudoku:
     @property
     def index_columns(self):
         '''
-        Return a list of ranges of indexes into the board, each
-        defining a column.
+        Return an iterable of ranges of indexes into the board, each defining a column.
         '''
         sz = self.size
         sz2 = sz ** 2
@@ -60,8 +52,7 @@ class Sudoku:
     @property
     def index_squares(self):
         '''
-        Return a list of ranges of indexes into the board, each
-        defining a square.
+        Return an iterable of ranges of indexes into the board, each defining a square.
         '''
         dim = self.dimension
         return (self.square(x, y) for y in range(dim) for x in range(dim))
@@ -88,6 +79,9 @@ class Sudoku:
 
         ranges = itertools.chain(*[_range(i) for i in range(dim)])
         return ranges
+
+    def _apply_index_ranges(self, ranges):
+        return ((self.board[i] for i in rng) for r in ranges)
 
     def __str__(self):
         field_width = len(str(self.size))
