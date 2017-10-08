@@ -7,10 +7,11 @@ Unit tests for the Sudoku module.
 import unittest
 import sudoku
 
-class Sudoku4Tests(unittest.TestCase):
+class Sudoku4TestCase(unittest.TestCase):
     def setUp(self):
         self.board = sudoku.Sudoku(size=4)
 
+class Sudoku4BasicTests(Sudoku4TestCase):
     def test_that_board_is_sane(self):
         self.assertEqual(self.board.size, 4)
         self.assertEqual(len(self.board.board), 4**2)
@@ -23,7 +24,7 @@ class Sudoku4Tests(unittest.TestCase):
             [ 8,  9, 10, 11],
             [12, 13, 14, 15]
         ]
-        for (row, exrow) in zip(self.board.rows, expected_rows):
+        for (row, exrow) in zip(self.board.index_rows, expected_rows):
             row_list = list(row)
             with self.subTest(row=row_list, ex=exrow):
                 self.assertEqual(row_list, exrow)
@@ -35,7 +36,7 @@ class Sudoku4Tests(unittest.TestCase):
             [2, 6, 10, 14],
             [3, 7, 11, 15]
         ]
-        for (col, excol) in zip(self.board.columns, expected_columns):
+        for (col, excol) in zip(self.board.index_columns, expected_columns):
             col_list = list(col)
             with self.subTest(col=col_list, ex=excol):
                 self.assertEqual(col_list, excol)
@@ -47,7 +48,7 @@ class Sudoku4Tests(unittest.TestCase):
             [ 8,  9, 12, 13],
             [10, 11, 14, 15]
         ]
-        for (sq, exsq) in zip(self.board.squares, expected_squares):
+        for (sq, exsq) in zip(self.board.index_squares, expected_squares):
             sq_list = list(sq)
             with self.subTest(sq=sq_list, ex=exsq):
                 self.assertEqual(sq_list, exsq)

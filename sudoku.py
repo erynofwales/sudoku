@@ -22,31 +22,49 @@ class Sudoku:
 
     @property
     def rows(self):
-        sz = self.size
-        return [range(i * sz, i * sz + sz) for i in range(sz)]
+        return self._apply_index_range_list(self.index_rows)
 
     @property
     def columns(self):
-        sz = self.size
-        sz2 = sz ** 2
-        return [range(i, sz2, sz) for i in range(sz)]
+        return self._apply_index_range_list(self.index_columns)
 
     @property
     def squares(self):
-        dim = self.dimension
-        return [self.square(x, y) for y in range(dim) for x in range(dim)]
+        return self._apply_index_range_list(self.index_squares)
+
+    def _apply_index_range_list(self, ranges):
+        return (self._apply_index_range(r) for r in ranges)
+
+    def _apply_index_range(self, rng):
+        return (self.board[i] for i in rng)
 
     @property
-    def solved(self):
-        def _check_group(group):
-            values = sorted([self.board[i] for i in group])
-            is_complete = values == list(range(1, self.size+1))
-            return is_complete
+    def index_rows(self):
+        '''
+        Return a list of ranges of indexes into the board, each
+        defining a row.
+        '''
+        sz = self.size
+        return (range(i * sz, i * sz + sz) for i in range(sz))
 
+    @property
+    def index_columns(self):
+        '''
+        Return a list of ranges of indexes into the board, each
+        defining a column.
+        '''
         sz = self.size
         sz2 = sz ** 2
-        dim = int(math.sqrt(self.size))
-        # TODO: WIP
+        return (range(i, sz2, sz) for i in range(sz))
+
+    @property
+    def index_squares(self):
+        '''
+        Return a list of ranges of indexes into the board, each
+        defining a square.
+        '''
+        dim = self.dimension
+        return (self.square(x, y) for y in range(dim) for x in range(dim))
 
     def square(self, x, y):
         dim = self.dimension
