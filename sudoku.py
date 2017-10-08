@@ -12,9 +12,13 @@ class Sudoku:
         dim = math.sqrt(size)
         if dim != int(dim):
             raise ValueError('Board size must have an integral square root.')
-        self.dimension = int(dim)
+        self._dimension = int(dim)
         self.size = size
         self.board = bytearray(b'\x00' * (size * size))
+
+    @property
+    def dimension(self):
+        return self._dimension
 
     @property
     def rows(self):
@@ -26,6 +30,11 @@ class Sudoku:
         sz = self.size
         sz2 = sz ** 2
         return [range(i, sz2, sz) for i in range(sz)]
+
+    @property
+    def squares(self):
+        dim = self.dimension
+        return [self.square(x, y) for y in range(dim) for x in range(dim)]
 
     @property
     def solved(self):
@@ -40,14 +49,16 @@ class Sudoku:
         # TODO: WIP
 
     def square(self, x, y):
-        dim = int(math.sqrt(self.size))
+        dim = self.dimension
         if (x < 0 or x >= dim) or (y < 0 or y >= dim):
             raise IndexError('Invalid coordinates for square: ({}, {})'.format(x, y))
-        offset_x = x * dim
-        offset_y = y * dim
+
+        offset = (x * dim, y * dim * self.size)
+
         def _range(i):
-            start = offset_x + i * self.size
+            start = (offset[1] + i * self.size) + offset[0]
             return range(start, start + dim)
+
         ranges = itertools.chain(*[_range(i) for i in range(dim)])
         return ranges
 
