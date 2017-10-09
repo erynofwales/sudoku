@@ -86,7 +86,7 @@ class Sudoku:
         return ranges
 
     def _apply_index_ranges(self, ranges):
-        return ((self.board[i] for i in rng) for r in ranges)
+        return ((self.board[i] for i in r) for r in ranges)
 
     def __str__(self):
         field_width = len(str(self.size))
