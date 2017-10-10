@@ -64,6 +64,12 @@ class Sudoku:
     def boxes(self):
         return self._apply_index_ranges(self.index_boxes)
 
+    def peers(self, x, y):
+        '''
+        Return a set of values of the peers for a given square.
+        '''
+        return {self._board[i] for i in self.index_peers(x, y) if self._board[i] != 0}
+
     @property
     def index_rows(self):
         '''
@@ -85,11 +91,10 @@ class Sudoku:
         '''
         return (self._box(x, y) for (x,y) in self.all_boxes)
 
-    def peers(self, x, y):
-        return {self._board[i] for i in self.index_peers(x, y) if self._board[i] != 0}
-
     def index_peers(self, x, y):
-        sz = self.size
+        '''
+        Return a set of the peers, indexes into the board, for a given square.
+        '''
         box = int(x / sz), int(y / sz)
         return set(self._row(y)) | set(self._column(x)) | set(self._box(*box))
 
