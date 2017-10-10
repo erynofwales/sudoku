@@ -28,7 +28,7 @@ def _parse_puzzle(puzzle):
     if len(puzzle) == 81:
         print("Parsing  '{}'".format(puzzle))
         board = (int('0' if x == '.' else x) for x in puzzle)
-        return sudoku.Sudoku(initial=board)
+        return sudoku.Sudoku(board=board)
     else:
         print("Skipping '{}'".format(puzzle))
         return None
