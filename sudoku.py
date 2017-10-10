@@ -8,20 +8,37 @@ import itertools
 import math
 
 class Sudoku:
-    def __init__(self, size=9, board=None):
-        dim = math.sqrt(size)
-        if dim != int(dim):
-            raise ValueError('Board size must have an integral square root.')
-        self._dimension = int(dim)
-        self.size = size
+    def __init__(self, size=3, board=None):
+        self._size = size
+        sz4 = size ** 4
         if board:
-            self._board = bytearray(board)[:size**2]
+            self._board = bytes(board)[:sz4]
         else:
-            self._board = bytearray(b'\x00' * (size * size))
+            self._board = bytes(sz4)
 
     @property
-    def dimension(self):
-        return self._dimension
+    def size(self):
+        return self._size
+
+    @property
+    def row_size(self):
+        return self.size ** 2
+
+    @property
+    def grid_size(self):
+        return self.size ** 4
+
+    @property
+    def all_squares(self):
+        return itertools.product(range(self.size), repeat=2)
+
+    @property
+    def possible_values(self):
+        '''
+        The set of valid values for any grid square, not accounting for values made invalid by already being
+        present in a peer of that square.
+        '''
+        return set(range(1, self.row_size + 1))
 
     @property
     def rows(self):
@@ -40,58 +57,52 @@ class Sudoku:
         '''
         Return an iterable of ranges of indexes into the board, each defining a row.
         '''
-        return (self._row(i, self.size) for i in range(self.size))
+        return (self._row(i) for i in range(self.row_size))
 
     @property
     def index_columns(self):
         '''
         Return an iterable of ranges of indexes into the board, each defining a column.
         '''
-        sz = self.size
-        sz2 = sz ** 2
-        return (self._column(i, sz, sz2) for i in range(sz))
+        return (self._column(i) for i in range(self.row_size))
 
     @property
     def index_squares(self):
         '''
         Return an iterable of ranges of indexes into the board, each defining a square.
         '''
-        dim = self.dimension
-        return (self._square(x, y, dim) for y in range(dim) for x in range(dim))
+        return (self._square(x, y) for (x,y) in self.all_squares)
 
     def peers(self, x, y):
         return {self._board[i] for i in self.index_peers(x, y) if self._board[i] != 0}
 
     def index_peers(self, x, y):
-        dim = self.dimension
         sz = self.size
-        sz2 = sz ** 2
-        sq_x, sq_y = int(x / dim), int(y / dim)
-        return set(self._row(y, sz)) | set(self._column(x, sz, sz2)) | set(self._square(sq_x, sq_y, dim))
+        sqx, sqy = int(x / sz), int(y / sz)
+        return set(self._row(y)) | set(self._column(x)) | set(self._square(sqx, sqy))
 
-    # TODO: Break the above into helper methods that produce a single thing given an index.
-    def _row(self, r, size):
-        return range(r * size, r * size + size)
+    def _row(self, r):
+        row_size = self.row_size
+        return range(r * row_size, r * row_size + row_size)
 
-    def _column(self, c, size, size2):
-        return range(c, size2, size)
+    def _column(self, c):
+        return range(c, self.grid_size, self.row_size)
 
-    def _square(self, x, y, dim):
-        if (x < 0 or x >= dim) or (y < 0 or y >= dim):
-            raise IndexError('Invalid coordinates for square: ({}, {})'.format(x, y))
-
-        offset = (x * dim, y * dim * self.size)
+    def _square(self, x, y):
+        size = self.size
+        row_size = self.row_size
+        offx, offy = (x * size, y * size * row_size)
 
         def _range(i):
-            start = (offset[1] + i * self.size) + offset[0]
-            return range(start, start + dim)
+            start = (offy + i * row_size) + offx
+            return range(start, start + size)
 
-        ranges = itertools.chain(*[_range(i) for i in range(dim)])
+        ranges = itertools.chain(*[_range(i) for i in range(size)])
         return ranges
 
     @property
     def solved(self):
-        expected = set(range(1, self.size + 1))
+        expected = self.possible_values
         all_groups = itertools.chain(self.rows, self.columns, self.squares)
         return all(expected == set(g) for g in all_groups)
 
@@ -99,19 +110,19 @@ class Sudoku:
         return ((self._board[i] for i in r) for r in ranges)
 
     def __str__(self):
-        field_width = len(str(self.size))
-        dim = self.dimension
+        field_width = len(str(max(self.possible_values)))
+        sz = self.size
         lines = []
-        spacer = '{0}{1}{0}'.format('+', '+'.join(['-' * (field_width * dim) for _ in range(dim)]))
+        spacer = '{0}{1}{0}'.format('+', '+'.join(['-' * (field_width * sz) for _ in range(sz)]))
         for line in range(self.size):
             chunks = []
-            for i in range(dim):
+            for i in range(sz):
                 fields = []
-                for j in range(dim):
-                    idx = line * self.size + i * dim + j
+                for j in range(sz):
+                    idx = line * self.size + i * sz + j
                     fields.append('{{board[{i}]:^{width}}}'.format(i=idx, width=field_width))
                 chunks.append(''.join(fields))
-            if (line % dim) == 0:
+            if (line % sz) == 0:
                 lines.append(spacer)
             lines.append('{0}{1}{0}'.format('|', '|'.join(chunks)))
         lines.append(spacer)

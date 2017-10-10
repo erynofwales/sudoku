@@ -9,13 +9,12 @@ import sudoku
 
 class Sudoku4TestCase(unittest.TestCase):
     def setUp(self):
-        self.board = sudoku.Sudoku(size=4)
+        self.board = sudoku.Sudoku(size=2)
 
 class Sudoku4BasicTests(Sudoku4TestCase):
     def test_that_board_is_sane(self):
-        self.assertEqual(self.board.size, 4)
-        self.assertEqual(len(self.board._board), 4**2)
-        self.assertEqual(self.board.dimension, 2)
+        self.assertEqual(self.board.size, 2)
+        self.assertEqual(len(self.board._board), 2**4)
 
     def test_rows(self):
         expected_rows = [
@@ -42,16 +41,16 @@ class Sudoku4BasicTests(Sudoku4TestCase):
                 self.assertEqual(col_list, excol)
 
     def test_squares(self):
-        expected_squares = [
-            [ 0,  1,  4,  5],
-            [ 2,  3,  6,  7],
-            [ 8,  9, 12, 13],
-            [10, 11, 14, 15]
-        ]
-        for (sq, exsq) in zip(self.board.index_squares, expected_squares):
-            sq_list = list(sq)
-            with self.subTest(sq=sq_list, ex=exsq):
-                self.assertEqual(sq_list, exsq)
+        expected_squares = {
+            (0,0): set([ 0,  1,  4,  5]),
+            (1,0): set([ 2,  3,  6,  7]),
+            (0,1): set([ 8,  9, 12, 13]),
+            (1,1): set([10, 11, 14, 15]),
+        }
+        for (coord, exsq) in expected_squares.items():
+            with self.subTest(sq=coord, ex=exsq):
+                sq = set(self.board._square(*coord))
+                self.assertEqual(sq, exsq)
 
     def test_peers(self):
         expected_peers = {
