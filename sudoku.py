@@ -40,8 +40,7 @@ class Sudoku:
         '''
         Return an iterable of ranges of indexes into the board, each defining a row.
         '''
-        sz = self.size
-        return (self._row(i, size) for i in range(sz))
+        return (self._row(i, self.size) for i in range(self.size))
 
     @property
     def index_columns(self):
@@ -50,7 +49,7 @@ class Sudoku:
         '''
         sz = self.size
         sz2 = sz ** 2
-        return (self._column(c, sz, sz2) for i in range(sz))
+        return (self._column(i, sz, sz2) for i in range(sz))
 
     @property
     def index_squares(self):
