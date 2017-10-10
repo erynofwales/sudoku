@@ -60,6 +60,16 @@ class Sudoku:
         dim = self.dimension
         return (self._square(x, y, dim) for y in range(dim) for x in range(dim))
 
+    def peers(self, x, y):
+        return {self._board[i] for i in self.index_peers(x, y) if self._board[i] != 0}
+
+    def index_peers(self, x, y):
+        dim = self.dimension
+        sz = self.size
+        sz2 = sz ** 2
+        sq_x, sq_y = int(x / dim), int(y / dim)
+        return set(self._row(y, sz)) | set(self._column(x, sz, sz2)) | set(self._square(sq_x, sq_y, dim))
+
     # TODO: Break the above into helper methods that produce a single thing given an index.
     def _row(self, r, size):
         return range(r * size, r * size + size)
