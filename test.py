@@ -40,17 +40,17 @@ class Sudoku4BasicTests(Sudoku4TestCase):
             with self.subTest(col=col_list, ex=excol):
                 self.assertEqual(col_list, excol)
 
-    def test_squares(self):
-        expected_squares = {
+    def test_boxes(self):
+        expected_boxes = {
             (0,0): set([ 0,  1,  4,  5]),
             (1,0): set([ 2,  3,  6,  7]),
             (0,1): set([ 8,  9, 12, 13]),
             (1,1): set([10, 11, 14, 15]),
         }
-        for (coord, exsq) in expected_squares.items():
-            with self.subTest(sq=coord, ex=exsq):
-                sq = set(self.board._square(*coord))
-                self.assertEqual(sq, exsq)
+        for (coord, exbox) in expected_boxes.items():
+            with self.subTest(sq=coord, ex=exbox):
+                sq = set(self.board._box(*coord))
+                self.assertEqual(sq, exbox)
 
     def test_peers(self):
         expected_peers = {

@@ -29,7 +29,10 @@ class Sudoku:
         return self.size ** 4
 
     @property
-    def all_squares(self):
+    def all_boxes(self):
+        '''
+        Iterator of xy-coordinates for every box in the grid.
+        '''
         return itertools.product(range(self.size), repeat=2)
 
     @property
@@ -49,8 +52,8 @@ class Sudoku:
         return self._apply_index_ranges(self.index_columns)
 
     @property
-    def squares(self):
-        return self._apply_index_ranges(self.index_squares)
+    def boxes(self):
+        return self._apply_index_ranges(self.index_boxes)
 
     @property
     def index_rows(self):
@@ -67,19 +70,19 @@ class Sudoku:
         return (self._column(i) for i in range(self.row_size))
 
     @property
-    def index_squares(self):
+    def index_boxes(self):
         '''
-        Return an iterable of ranges of indexes into the board, each defining a square.
+        Return an iterable of ranges of indexes into the board, each defining a box.
         '''
-        return (self._square(x, y) for (x,y) in self.all_squares)
+        return (self._box(x, y) for (x,y) in self.all_boxes)
 
     def peers(self, x, y):
         return {self._board[i] for i in self.index_peers(x, y) if self._board[i] != 0}
 
     def index_peers(self, x, y):
         sz = self.size
-        sqx, sqy = int(x / sz), int(y / sz)
-        return set(self._row(y)) | set(self._column(x)) | set(self._square(sqx, sqy))
+        box = int(x / sz), int(y / sz)
+        return set(self._row(y)) | set(self._column(x)) | set(self._box(*box))
 
     def _row(self, r):
         row_size = self.row_size
@@ -88,7 +91,7 @@ class Sudoku:
     def _column(self, c):
         return range(c, self.grid_size, self.row_size)
 
-    def _square(self, x, y):
+    def _box(self, x, y):
         size = self.size
         row_size = self.row_size
         offx, offy = (x * size, y * size * row_size)
@@ -103,7 +106,7 @@ class Sudoku:
     @property
     def solved(self):
         expected = self.possible_values
-        all_groups = itertools.chain(self.rows, self.columns, self.squares)
+        all_groups = itertools.chain(self.rows, self.columns, self.boxes)
         return all(expected == set(g) for g in all_groups)
 
     def _apply_index_ranges(self, ranges):
