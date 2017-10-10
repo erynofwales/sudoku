@@ -41,7 +41,7 @@ class Sudoku:
         Return an iterable of ranges of indexes into the board, each defining a row.
         '''
         sz = self.size
-        return (range(i * sz, i * sz + sz) for i in range(sz))
+        return (self._row(i, size) for i in range(sz))
 
     @property
     def index_columns(self):
@@ -50,7 +50,7 @@ class Sudoku:
         '''
         sz = self.size
         sz2 = sz ** 2
-        return (range(i, sz2, sz) for i in range(sz))
+        return (self._column(c, sz, sz2) for i in range(sz))
 
     @property
     def index_squares(self):
@@ -58,21 +58,16 @@ class Sudoku:
         Return an iterable of ranges of indexes into the board, each defining a square.
         '''
         dim = self.dimension
-        return (self.square(x, y) for y in range(dim) for x in range(dim))
+        return (self._square(x, y, dim) for y in range(dim) for x in range(dim))
 
     # TODO: Break the above into helper methods that produce a single thing given an index.
+    def _row(self, r, size):
+        return range(r * size, r * size + size)
 
-    @property
-    def solved(self):
-        expected = set(range(self.size))
-        return all([
-            all(expected == set(row) for row in self.rows),
-            all(expected == set(col) for col in self.columns),
-            all(expected == set(sqr) for sqr in self.squares)
-        ])
+    def _column(self, c, size, size2):
+        return range(c, size2, size)
 
-    def square(self, x, y):
-        dim = self.dimension
+    def _square(self, x, y, dim):
         if (x < 0 or x >= dim) or (y < 0 or y >= dim):
             raise IndexError('Invalid coordinates for square: ({}, {})'.format(x, y))
 
@@ -84,6 +79,15 @@ class Sudoku:
 
         ranges = itertools.chain(*[_range(i) for i in range(dim)])
         return ranges
+
+    @property
+    def solved(self):
+        expected = set(range(self.size))
+        return all([
+            all(expected == set(row) for row in self.rows),
+            all(expected == set(col) for col in self.columns),
+            all(expected == set(sqr) for sqr in self.squares)
+        ])
 
     def _apply_index_ranges(self, ranges):
         return ((self._board[i] for i in r) for r in ranges)
