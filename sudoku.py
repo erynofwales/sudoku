@@ -18,14 +18,23 @@ class Sudoku:
 
     @property
     def size(self):
+        '''
+        The size of the board. This dictates the length of one side of the boxes that the board is subdivided into.
+        '''
         return self._size
 
     @property
     def row_size(self):
+        '''
+        The length of a row or column, or the area of a box in the grid.
+        '''
         return self.size ** 2
 
     @property
     def grid_size(self):
+        '''
+        The total number of squares in the grid.
+        '''
         return self.size ** 4
 
     @property
@@ -38,8 +47,8 @@ class Sudoku:
     @property
     def possible_values(self):
         '''
-        The set of valid values for any grid square, not accounting for values made invalid by already being
-        present in a peer of that square.
+        The set of valid values for any grid square. This method does not account for values made invalid by already
+        being present in a peer of a given square.
         '''
         return set(range(1, self.row_size + 1))
 
