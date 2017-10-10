@@ -85,5 +85,5 @@ class Sudoku4SolvedTests(Sudoku4TestCase):
 
     def test_simple_solution_is_solved(self):
         board = (int(i) for i in '1234341221434321')
-        self.board = sudoku.Sudoku(4, board)
+        self.board = sudoku.Sudoku(2, board)
         self.assertTrue(self.board.solved)
