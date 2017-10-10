@@ -94,9 +94,9 @@ class Sudoku:
 
     def __str__(self):
         field_width = len(str(self.size))
-        dim = int(math.sqrt(self.size))
+        dim = self.dimension
         lines = []
-        spacer = '+' + '+'.join(['-' * (field_width * dim) for _ in range(dim)]) + '+'
+        spacer = '{0}{1}{0}'.format('+', '+'.join(['-' * (field_width * dim) for _ in range(dim)]))
         for line in range(self.size):
             chunks = []
             for i in range(dim):
@@ -107,7 +107,7 @@ class Sudoku:
                 chunks.append(''.join(fields))
             if (line % dim) == 0:
                 lines.append(spacer)
-            lines.append('|' + '|'.join(chunks) + '|')
+            lines.append('{0}{1}{0}'.format('|', '|'.join(chunks)))
         lines.append(spacer)
         fmt = '\n'.join(lines)
         str_board = [str(n) if n != 0 else ' ' for n in self._board]
