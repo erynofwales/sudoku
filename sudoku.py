@@ -91,12 +91,9 @@ class Sudoku:
 
     @property
     def solved(self):
-        expected = set(range(self.size))
-        return all([
-            all(expected == set(row) for row in self.rows),
-            all(expected == set(col) for col in self.columns),
-            all(expected == set(sqr) for sqr in self.squares)
-        ])
+        expected = set(range(1, self.size + 1))
+        all_groups = itertools.chain(self.rows, self.columns, self.squares)
+        return all(expected == set(g) for g in all_groups)
 
     def _apply_index_ranges(self, ranges):
         return ((self._board[i] for i in r) for r in ranges)

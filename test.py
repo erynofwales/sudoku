@@ -83,3 +83,8 @@ class Sudoku4BasicTests(Sudoku4TestCase):
 class Sudoku4SolvedTests(Sudoku4TestCase):
     def test_that_an_empty_board_is_not_solved(self):
         self.assertFalse(self.board.solved)
+
+    def test_simple_solution_is_solved(self):
+        board = (int(i) for i in '1234341221434321')
+        self.board = sudoku.Sudoku(4, board)
+        self.assertTrue(self.board.solved)
