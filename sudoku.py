@@ -13,8 +13,10 @@ class Sudoku:
         sz4 = size ** 4
         if board:
             self._board = bytes(board)[:sz4]
+            self._clues = set(i for i in range(len(self._board)) if self._board[i] != 0)
         else:
             self._board = bytes(sz4)
+            self._clues = set()
 
     @property
     def size(self):
