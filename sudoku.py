@@ -133,7 +133,7 @@ class Sudoku:
         sz = self.size
         lines = []
         spacer = '{0}{1}{0}'.format('+', '+'.join(['-' * (field_width * sz) for _ in range(sz)]))
-        for line in range(self.size):
+        for line in range(self.row_size):
             chunks = []
             for i in range(sz):
                 fields = []
