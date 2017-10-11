@@ -44,13 +44,14 @@ def parse_args(args):
     parser.add_argument('--euler', '-e', dest='library', action='store_const', const=euler, default=None)
     parser.add_argument('--norvig', '-n', dest='library', action='store_const', const=norvig, default=None)
     parser.add_argument('--verbose', '-v', action='store_true', default=False)
-    parser.add_argument('index', default=0, type=int)
+    parser.add_argument('indexes', metavar='N', nargs='+', type=int)
     return parser.parse_args(args)
 
 def main():
     args = parse_args(sys.argv[1:])
     parse_puzzle_files(quiet=not args.verbose)
-    print(args.library[args.index])
+    for i in args.indexes:
+        print(args.library[i])
     return 0
 
 if __name__ == '__main__':
