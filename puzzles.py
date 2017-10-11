@@ -8,6 +8,8 @@ import argparse
 import os.path
 import sys
 
+from sudoku import Sudoku
+
 euler = []
 norvig = []
 
