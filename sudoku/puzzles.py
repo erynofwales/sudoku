@@ -5,22 +5,22 @@ Parser for puzzles in the ./puzzles directory.
 '''
 
 import argparse
-import sudoku
+import os.path
 import sys
 
 euler = []
 norvig = []
 
-def parse_puzzle_files(quiet=True):
+def parse_puzzle_files(path, quiet=True):
     global euler, norvig
 
     if not quiet:
         print('Parsing Euler puzzles')
-    euler.extend(_get_puzzles('puzzles/euler.txt', quiet))
+    euler.extend(_get_puzzles(os.path.join(path, 'euler.txt'), quiet))
 
     if not quiet:
         print('Parsing Norvig puzzles')
-    norvig.extend(_get_puzzles('puzzles/norvig.txt', quiet))
+    norvig.extend(_get_puzzles(os.path.join(path, 'norvig.txt'), quiet))
 
 def _get_puzzles(filename, quiet):
     with open(filename, 'r') as f:
@@ -33,7 +33,7 @@ def _parse_puzzle(puzzle, quiet):
         if not quiet:
             print("Parsing  '{}'".format(puzzle))
         board = (int('0' if x == '.' else x) for x in puzzle)
-        return sudoku.Sudoku(board=board)
+        return Sudoku(board=board)
     else:
         if not quiet:
             print("Skipping '{}'".format(puzzle))
@@ -44,12 +44,13 @@ def parse_args(args):
     parser.add_argument('--euler', '-e', dest='library', action='store_const', const=euler, default=None)
     parser.add_argument('--norvig', '-n', dest='library', action='store_const', const=norvig, default=None)
     parser.add_argument('--verbose', '-v', action='store_true', default=False)
+    parser.add_argument('--library', '-l', dest='path', default='./puzzles')
     parser.add_argument('indexes', metavar='N', nargs='+', type=int)
     return parser.parse_args(args)
 
 def main():
     args = parse_args(sys.argv[1:])
-    parse_puzzle_files(quiet=not args.verbose)
+    parse_puzzle_files(args.path, quiet=not args.verbose)
     for i in args.indexes:
         print(args.library[i])
     return 0
