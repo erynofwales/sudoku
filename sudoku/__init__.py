@@ -100,7 +100,7 @@ class Sudoku:
         '''
         Return a set of the peers, indexes into the board, for a given square.
         '''
-        box = int(x / sz), int(y / sz)
+        box = int(x / self.size), int(y / self.size)
         return set(self._row(y)) | set(self._column(x)) | set(self._box(*box))
 
     def _row(self, r):
