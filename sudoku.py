@@ -128,6 +128,9 @@ class Sudoku:
         all_groups = itertools.chain(self.rows, self.columns, self.boxes)
         return all(expected == set(g) for g in all_groups)
 
+    def solve(self, solver):
+        return solver.solve(self)
+
     def _apply_index_ranges(self, ranges):
         return ((self._board[i] for i in r) for r in ranges)
 
