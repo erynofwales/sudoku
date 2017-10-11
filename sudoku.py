@@ -7,6 +7,9 @@ A Sudoku puzzle solver.
 import itertools
 import math
 
+BOLD_SEQUENCE = '\x1B[1m'
+UNBOLD_SEQUENCE = '\x1B[0m'
+
 class Sudoku:
     def __init__(self, size=3, board=None):
         self._size = size
@@ -139,7 +142,12 @@ class Sudoku:
                 fields = []
                 for j in range(sz):
                     idx = line * self.size + i * sz + j
-                    fields.append('{{board[{i}]:^{width}}}'.format(i=idx, width=field_width))
+                    if idx in self._clues:
+                        bold = BOLD_SEQUENCE
+                        unbold = UNBOLD_SEQUENCE
+                    else:
+                        bold = unbold = ''
+                    fields.append('{bold}{{board[{i}]:^{{width}}}}{unbold}'.format(i=idx, bold=bold, unbold=unbold))
                 chunks.append(''.join(fields))
             if (line % sz) == 0:
                 lines.append(spacer)
@@ -147,5 +155,5 @@ class Sudoku:
         lines.append(spacer)
         fmt = '\n'.join(lines)
         str_board = [str(n) if n != 0 else ' ' for n in self._board]
-        out = fmt.format(board=str_board)
+        out = fmt.format(board=str_board, width=field_width)
         return out
