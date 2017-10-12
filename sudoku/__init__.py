@@ -143,10 +143,6 @@ class Sudoku:
         return solver(self)
 
     def set(self, x, y, value):
-        idx = self._xy_to_idx(x, y)
-        if idx in self._clues:
-            raise SquareIsClue('Cannot set clue square ({},{})'.format(x, y))
-
         if value not in self.possible_values:
             raise ValueError('{} not in set of possible values {}'.format(value, self.possible_values))
 
@@ -156,8 +152,17 @@ class Sudoku:
         if value in peers:
             raise ValueExistsInPeers('{} already exists in the peer set for ({},{})'.format(value, x, y))
 
+        self._set(x, y, value)
+
+    def unset(self, x, y):
+        self._set(x, y, 0)
+
+    def _set(self, x, y, value):
+        idx = self._xy_to_idx(x, y)
+        if idx in self._clues:
+            raise SquareIsClue('Cannot set clue square ({},{})'.format(x, y))
         self._board[idx] = value
-        print('({},{}) <- {} (p:{}) {!r}'.format(x, y, value, peers, self))
+        print('({},{}) <- {} {!r}'.format(x, y, value, self))
 
     def _xy_to_idx(self, x, y):
         return y * self.row_size + x
