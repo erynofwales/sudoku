@@ -140,7 +140,7 @@ class Sudoku:
         return all(expected == set(g) for g in all_groups)
 
     def solve(self, solver):
-        return solver.solve(self)
+        return solver(self)
 
     def set(self, x, y, value):
         idx = self._xy_to_idx(x, y)
