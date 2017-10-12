@@ -162,7 +162,6 @@ class Sudoku:
         if idx in self._clues:
             raise SquareIsClue('Cannot set clue square ({},{})'.format(x, y))
         self._board[idx] = value
-        print('({},{}) <- {} {!r}'.format(x, y, value, self))
 
     def _xy_to_idx(self, x, y):
         return y * self.row_size + x

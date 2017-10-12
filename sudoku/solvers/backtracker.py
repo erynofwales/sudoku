@@ -26,8 +26,10 @@ def _solve_square(sudoku, x, y):
             continue
         except NoPossibleValues:
             # Need to backtrack.
-            sudoku.unset(x, y)
-            raise Backtrack()
+            should_backtrack = True
+            break
+
+        print('\r{!r}'.format(sudoku), end='', flush=True)
 
         next_coord = _next_coord(sudoku, x, y)
         if not next_coord:
@@ -40,12 +42,13 @@ def _solve_square(sudoku, x, y):
             continue
 
     if should_backtrack:
-        # Unhandled backtrack. Pop out of this one too.
         try:
             sudoku.unset(x, y)
         except SquareIsClue:
             pass
         raise Backtrack()
+
+    print()
 
     return sudoku
 
