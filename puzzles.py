@@ -9,6 +9,7 @@ import os.path
 import sys
 
 from sudoku import Sudoku
+from sudoku.solvers import backtracker
 
 euler = []
 norvig = []
@@ -44,9 +45,10 @@ def _parse_puzzle(puzzle, quiet):
 def parse_args(args):
     parser = argparse.ArgumentParser()
     parser.add_argument('--euler', '-e', dest='library', action='store_const', const=euler, default=None)
-    parser.add_argument('--norvig', '-n', dest='library', action='store_const', const=norvig, default=None)
-    parser.add_argument('--verbose', '-v', action='store_true', default=False)
     parser.add_argument('--library', '-l', dest='path', default='./puzzles')
+    parser.add_argument('--norvig', '-n', dest='library', action='store_const', const=norvig, default=None)
+    parser.add_argument('--solver', '-s', default=None)
+    parser.add_argument('--verbose', '-v', action='store_true', default=False)
     parser.add_argument('indexes', metavar='N', nargs='+', type=int)
     return parser.parse_args(args)
 
@@ -54,7 +56,12 @@ def main():
     args = parse_args(sys.argv[1:])
     parse_puzzle_files(args.path, quiet=not args.verbose)
     for i in args.indexes:
-        print(args.library[i])
+        puzzle = args.library[i]
+        print(puzzle)
+        if args.solver is not None:
+            if args.solver == 'backtracking':
+                puzzle.solve(backtracker.solve)
+            print(puzzle)
     return 0
 
 if __name__ == '__main__':
