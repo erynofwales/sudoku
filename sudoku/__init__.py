@@ -157,6 +157,7 @@ class Sudoku:
             raise ValueExistsInPeers('{} already exists in the peer set for ({},{})'.format(value, x, y))
 
         self._board[idx] = value
+        print('({},{}) <- {} (p:{}) {!r}'.format(x, y, value, peers, self))
 
     def _xy_to_idx(self, x, y):
         return y * self.row_size + x
