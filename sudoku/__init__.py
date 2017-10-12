@@ -20,6 +20,7 @@ class Sudoku:
         else:
             self._board = bytearray(sz4)
             self._clues = frozenset()
+        self._possible_values = None
 
     @property
     def size(self):
@@ -62,7 +63,9 @@ class Sudoku:
         The set of valid values for any grid square. This method does not account for values made invalid by already
         being present in a peer of a given square.
         '''
-        return set(range(1, self.row_size + 1))
+        if not self._possible_values:
+            self._possible_values = set(range(1, self.row_size + 1))
+        return self._possible_values
 
     @property
     def rows(self):
