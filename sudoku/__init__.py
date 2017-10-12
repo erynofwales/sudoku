@@ -148,6 +148,11 @@ class Sudoku:
     def _apply_index_ranges(self, ranges):
         return ((self._board[i] for i in r) for r in ranges)
 
+    def __repr__(self):
+        return "{}(size={}, board='{}')".format(self.__class__.__name__,
+                                                self.size,
+                                                ''.join(str(i) for i in self._board))
+
     def __str__(self):
         field_width = len(str(max(self.possible_values)))
         spacer = '{0}{1}{0}'.format('+', '+'.join(['-' * (field_width * self.size) for _ in range(self.size)]))
