@@ -8,22 +8,16 @@ import argparse
 import os.path
 import sys
 
-from sudoku import Sudoku
-from sudoku.solvers import backtracker
+from sudoku import Sudoku, solvers
 
 euler = []
 norvig = []
 
-def parse_puzzle_files(path, quiet=True):
-    global euler, norvig
-
+def parse_puzzle_library(path, quiet=True):
     if not quiet:
-        print('Parsing Euler puzzles')
-    euler.extend(_get_puzzles(os.path.join(path, 'euler.txt'), quiet))
-
-    if not quiet:
-        print('Parsing Norvig puzzles')
-    norvig.extend(_get_puzzles(os.path.join(path, 'norvig.txt'), quiet))
+        print('Parsing puzzles in {}'.format(path))
+    puzzles = _get_puzzles(path, quiet)
+    return puzzles
 
 def _get_puzzles(filename, quiet):
     with open(filename, 'r') as f:
@@ -44,23 +38,28 @@ def _parse_puzzle(puzzle, quiet):
 
 def parse_args(args):
     parser = argparse.ArgumentParser()
-    parser.add_argument('--euler', '-e', dest='library', action='store_const', const=euler, default=None)
-    parser.add_argument('--library', '-l', dest='path', default='./puzzles')
-    parser.add_argument('--norvig', '-n', dest='library', action='store_const', const=norvig, default=None)
-    parser.add_argument('--solver', '-s', default=None)
-    parser.add_argument('--verbose', '-v', action='store_true', default=False)
-    parser.add_argument('indexes', metavar='N', nargs='+', type=int)
+    parser.add_argument('--solver', '-s', default=None,
+                        help='The solver to use to solve this puzzle.')
+    parser.add_argument('--verbose', '-v', action='store_true', default=False,
+                        help='Print extra information when parsing puzzle libraries.')
+    parser.add_argument('library',
+                        help='A library file containing puzzles, one per line.')
+    parser.add_argument('indexes', metavar='N', nargs='+', type=int,
+                        help='0-based indexes of puzzles in the library')
     return parser.parse_args(args)
 
 def main():
     args = parse_args(sys.argv[1:])
-    parse_puzzle_files(args.path, quiet=not args.verbose)
+    puzzle_library = list(parse_puzzle_library(args.library, quiet=not args.verbose))
     for i in args.indexes:
-        puzzle = args.library[i]
+        puzzle = puzzle_library[i]
         print(puzzle)
         if args.solver is not None:
-            if args.solver == 'backtracking':
-                puzzle.solve(backtracker.solve)
+            try:
+                solver = getattr(solvers, args.solver)
+                puzzle.solve(solver.solve)
+            except AttributeError:
+                print('No solver named {}'.format(args.solver))
             print(puzzle)
     return 0
 
