@@ -43,6 +43,13 @@ class Sudoku:
         return self.size ** 4
 
     @property
+    def all_squares(self):
+        '''
+        Iterator of xy-coordinates for every square in the grid.
+        '''
+        return itertools.product(range(self.row_size), repeat=2)
+
+    @property
     def all_boxes(self):
         '''
         Iterator of xy-coordinates for every box in the grid.
@@ -131,32 +138,38 @@ class Sudoku:
     def solve(self, solver):
         return solver.solve(self)
 
+    def _xy_to_idx(self, x, y):
+        return y * self.row_size + x
+
     def _apply_index_ranges(self, ranges):
         return ((self._board[i] for i in r) for r in ranges)
 
     def __str__(self):
         field_width = len(str(max(self.possible_values)))
-        sz = self.size
-        lines = []
-        spacer = '{0}{1}{0}'.format('+', '+'.join(['-' * (field_width * sz) for _ in range(sz)]))
-        for line in range(self.row_size):
-            chunks = []
-            for i in range(sz):
-                fields = []
-                for j in range(sz):
-                    idx = line * self.size + i * sz + j
-                    if idx in self._clues:
-                        bold = BOLD_SEQUENCE
-                        unbold = UNBOLD_SEQUENCE
-                    else:
-                        bold = unbold = ''
-                    fields.append('{bold}{{board[{i}]:^{{width}}}}{unbold}'.format(i=idx, bold=bold, unbold=unbold))
-                chunks.append(''.join(fields))
-            if (line % sz) == 0:
-                lines.append(spacer)
-            lines.append('{0}{1}{0}'.format('|', '|'.join(chunks)))
-        lines.append(spacer)
-        fmt = '\n'.join(lines)
-        str_board = [str(n) if n != 0 else ' ' for n in self._board]
-        out = fmt.format(board=str_board, width=field_width)
-        return out
+        spacer = '{0}{1}{0}'.format('+', '+'.join(['-' * (field_width * self.size) for _ in range(self.size)]))
+
+        fmt = ''
+        for (y,x) in self.all_squares:
+            if x == 0:
+                if y % self.size == 0:
+                    if y != 0:
+                        fmt += '\n'
+                    fmt += '{spacer}'
+                fmt += '\n'
+
+            if x % self.size == 0:
+                fmt += '|'
+
+            idx = self._xy_to_idx(x,y)
+            if idx in self._clues:
+                bold = BOLD_SEQUENCE
+                unbold = UNBOLD_SEQUENCE
+            else:
+                bold = unbold = ''
+            fmt += '{bold}{{board[{i}]:^{{width}}}}{unbold}'.format(i=idx, bold=bold, unbold=unbold)
+
+            if x == (self.row_size - 1):
+                fmt += '|'
+        fmt += '\n{spacer}'
+
+        return fmt.format(board=[str(i) if i != 0 else ' ' for i in self._board], spacer=spacer, width=field_width)
