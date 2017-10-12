@@ -1,8 +1,6 @@
 # Eryn Wells <eryn@erynwells.me>
 '''
+A library of Sudoku solvers.
 '''
 
-class Solver:
-    def solve(self, sudoku):
-        # TODO: Any subclass of Solver should implement this.
-        raise NotImplementedError
+from . import backtracker
