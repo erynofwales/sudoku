@@ -110,8 +110,9 @@ class Sudoku:
         '''
         Return a set of the peers, indexes into the board, for a given square.
         '''
+        idx = self._xy_to_idx(x, y)
         box = int(x / self.size), int(y / self.size)
-        return set(self._row(y)) | set(self._column(x)) | set(self._box(*box))
+        return (set(self._row(y)) | set(self._column(x)) | set(self._box(*box))) - {idx}
 
     def _row(self, r):
         row_size = self.row_size
