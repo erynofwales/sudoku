@@ -146,6 +146,11 @@ class Sudoku:
     def solve(self, solver):
         return solver(self)
 
+    def get(self, x, y):
+        idx = self._xy_to_idx(x, y)
+        value = self._board[idx]
+        return None if value == 0 else value
+
     def set(self, x, y, value):
         if value not in self.possible_values:
             raise ValueError('{} not in set of possible values {}'.format(value, self.possible_values))
