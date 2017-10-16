@@ -3,4 +3,4 @@
 A library of Sudoku solvers.
 '''
 
-from . import backtracker
+from . import backtracker, dlx
