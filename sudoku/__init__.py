@@ -67,6 +67,10 @@ class Sudoku:
             self._possible_values = set(range(1, self.row_size + 1))
         return self._possible_values
 
+    def possible_values_for_square(self, x, y):
+        peers = self.peers(x, y)
+        return self.possible_values - peers
+
     @property
     def rows(self):
         return self._apply_index_ranges(self.index_rows)
