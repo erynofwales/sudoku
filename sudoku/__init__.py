@@ -68,8 +68,12 @@ class Sudoku:
         return self._possible_values
 
     def possible_values_for_square(self, x, y):
-        peers = self.peers(x, y)
-        return self.possible_values - peers
+        value = self.get(x, y)
+        if value:
+            return {value}
+        else:
+            peers = self.peers(x, y)
+            return self.possible_values - peers
 
     @property
     def rows(self):

@@ -124,7 +124,7 @@ def _build_headers(sudoku):
 def _build_rows(sudoku, headers):
     for (index, coords) in enumerate(sudoku.all_squares):
         board_value = sudoku.get(*coords)
-        possibilities = {board_value} if board_value else sudoku.possible_values_for_square(*coords)
+        possibilities = sudoku.possible_values_for_square(*coords)
         for value in possibilities:
             cur = None
             for col in headers.iterate_row():
